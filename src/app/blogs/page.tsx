@@ -19,15 +19,24 @@ export const getServerSideProps: GetServerSideProps<BlogsProps> = async () => {
       cache: "no-store",
     });
 
+    if (!res.ok) {
+      throw new Error(`Failed to fetch data. Status: ${res.status}`);
+    }
+
     const data = await res.json();
+
+    if (!data.success) {
+      throw new Error(`Failed to fetch data. Message: ${data.message}`);
+    }
 
     return {
       props: {
-        blogPostsList: data.success ? (data.data as Blog[]) : [],
+        blogPostsList: data.data as Blog[],
       },
     };
-  } catch (error) {
-    console.error("Error fetching data:", error);
+  } catch (error: any) {
+    // Explicitly specify the type of 'error' as 'any'
+    console.error("Error fetching data:", error.message);
     return {
       props: {
         blogPostsList: [],
