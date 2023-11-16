@@ -18,7 +18,7 @@ export default function Home() {
                   Greetings, tech enthusiasts and creative minds! We are
                   thrilled to welcome you to Gamasti Gallery, the ultimate hub
                   for showcasing the brilliance of Mahasiswa Teknik Informatika
-                  (Computer Science Students).
+                  (Computer Science Students)!.
                 </p>
               </div>
               <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
