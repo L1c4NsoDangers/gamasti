@@ -1,27 +1,40 @@
 "use client";
 
-import { Blog } from "../../utils/types";
+// BlogList.jsx
+
+import { Blog } from "@/components/utils/types";
 import SingleBlog from "../single-blog";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function BlogList({ lists }: { lists: Blog[] }) {
   const router = useRouter();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
   useEffect(() => {
-    router.refresh();
-  }, []);
+    if (isRefreshing) {
+      router.refresh();
+      setIsRefreshing(false);
+    }
+  }, [isRefreshing, router]);
 
   async function handleDelete(id: number) {
-    console.log(id);
+    try {
+      const res = await fetch(`/api/blog-post/delete-post?id=${id}`, {
+        method: "DELETE",
+        cache: "no-store",
+      });
 
-    const res = await fetch(`/api/blog-post/delete-post?id=${id}`, {
-      method: "DELETE",
-      cache: "no-store",
-    });
+      const data = await res.json();
 
-    const data = await res.json();
-
-    if (data && data.success) router.refresh();
+      if (data && data.success) {
+        setIsRefreshing(true);
+      } else {
+        console.error("Failed to delete blog:", data);
+      }
+    } catch (error) {
+      console.error("Error while deleting blog:", error);
+    }
   }
 
   return (
