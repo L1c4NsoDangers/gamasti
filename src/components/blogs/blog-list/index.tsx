@@ -2,26 +2,44 @@
 
 import { Blog } from "@/components/utils/types";
 import SingleBlog from "../single-blog";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function BlogList({ lists }: { lists: Blog[] }) {
   const router = useRouter();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
   useEffect(() => {
-    router.refresh();
-  }, [router]);
+    if (isRefreshing) {
+      router.refresh();
+      setIsRefreshing(false);
+    }
+  }, [isRefreshing, router]);
 
   async function handleDelete(id: number) {
-    console.log(id);
+    try {
+      // Optimistically update UI immediately
+      const updatedLists = lists.filter((item) => item.id !== id);
+      setLists(updatedLists);
 
-    const res = await fetch(`/api/blog-post/delete-post?id=${id}`, {
-      method: "DELETE",
-      cache: "no-store",
-    });
+      const res = await fetch(`/api/blog-post/delete-post?id=${id}`, {
+        method: "DELETE",
+        cache: "no-store",
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (data && data.success) router.refresh();
+      if (data && data.success) {
+        // Refresh only if needed, or let it update when the server responds
+        setIsRefreshing(true);
+      } else {
+        // Revert UI back to the previous state if deletion fails
+        setLists([...lists]); // Assuming you have a state for lists
+        console.error("Failed to delete post:", data);
+      }
+    } catch (error) {
+      console.error("Error while deleting post:", error);
+    }
   }
 
   return (
@@ -39,4 +57,7 @@ export default function BlogList({ lists }: { lists: Blog[] }) {
       </div>
     </section>
   );
+}
+function setLists(updatedLists: Blog[]) {
+  throw new Error("Function not implemented.");
 }
