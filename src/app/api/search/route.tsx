@@ -1,6 +1,9 @@
 import prisma from "@/database";
 import { NextRequest, NextResponse } from "next/server";
 
+// Dynamic export to control rendering mode
+export const dynamic = "force-dynamic";
+
 export async function GET(req: NextRequest) {
   try {
     const url = new URL(req.url);
@@ -39,7 +42,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       success: false,
-      message: "Something went wrong ! Please try again",
+      message: "Something went wrong! Please try again",
     });
   }
 }
