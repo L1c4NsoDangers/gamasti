@@ -8,7 +8,12 @@ async function extractAllBlogs() {
     });
 
     if (!res.ok) {
-      throw new Error(`Failed to fetch blogs. Status: ${res.status}`);
+      if (res.status === 404) {
+        console.warn("Blogs not found. Returning empty array.");
+        return [];
+      } else {
+        throw new Error(`Failed to fetch blogs. Status: ${res.status}`);
+      }
     }
 
     const data = await res.json();
@@ -20,7 +25,7 @@ async function extractAllBlogs() {
     }
   } catch (error) {
     console.error("Error fetching or parsing blogs:", error);
-    // Handle error appropriately, e.g., return a default value or show an error message
+    // Handle other errors appropriately
     return [];
   }
 }
