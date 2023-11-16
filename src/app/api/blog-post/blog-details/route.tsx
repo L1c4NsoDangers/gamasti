@@ -6,6 +6,13 @@ export async function GET(req: NextRequest) {
     const url = new URL(req.url);
     const blogID = url.searchParams.get("blogID");
 
+    if (!blogID) {
+      return NextResponse.json({
+        success: false,
+        message: "Missing or invalid 'blogID' parameter",
+      });
+    }
+
     const blogDetails = await prisma.post.findUnique({
       where: {
         id: Number(blogID),
@@ -20,15 +27,15 @@ export async function GET(req: NextRequest) {
     } else {
       return NextResponse.json({
         success: false,
-        message: "Failed to fetch the blog details ! Please try again",
+        message: "Failed to fetch the blog details! Please try again",
       });
     }
   } catch (e) {
-    console.log(e);
+    console.error(e);
 
     return NextResponse.json({
       success: false,
-      message: "Something went wrong ! Please try again",
+      message: "Something went wrong! Please try again",
     });
   }
 }
