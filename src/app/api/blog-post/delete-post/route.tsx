@@ -6,6 +6,8 @@ export async function DELETE(req: NextRequest) {
     const url = new URL(req.url);
     const extractIdOfBlogItemToBeDeleted = url.searchParams.get("id");
 
+    // ...
+
     const deletedBlogPost = await prisma.post.delete({
       where: {
         id: Number(extractIdOfBlogItemToBeDeleted),
@@ -18,9 +20,10 @@ export async function DELETE(req: NextRequest) {
         message: "Blog deleted successfully",
       });
     } else {
+      // Handle the case where the deletion was not successful
       return NextResponse.json({
         success: false,
-        message: "Failed to delete the blog ! Please try again",
+        message: "Failed to delete the blog! Please try again",
       });
     }
   } catch (e) {
