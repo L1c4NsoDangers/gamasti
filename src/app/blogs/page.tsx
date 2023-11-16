@@ -1,18 +1,37 @@
 import BlogList from "@/components/blogs/blog-list";
 
 async function extractAllBlogs() {
-  const res = await fetch(`${process.env.URL}/api/blog-post/get-all-post`, {
-    method: "GET",
-    cache: "no-store",
-  });
+  try {
+    const res = await fetch(`${process.env.URL}/api/blog-post/get-all-post`, {
+      method: "GET",
+      cache: "no-store",
+    });
 
-  const data = await res.json();
+    if (!res.ok) {
+      throw new Error(`Failed to fetch blogs. Status: ${res.status}`);
+    }
 
-  if (data.success) return data.data;
+    const data = await res.json();
+
+    if (data.success) {
+      return data.data;
+    } else {
+      throw new Error(`Failed to retrieve blog data. Message: ${data.message}`);
+    }
+  } catch (error) {
+    console.error("Error fetching or parsing blogs:", error);
+    // Handle error appropriately, e.g., return a default value or show an error message
+    return [];
+  }
 }
 
 export default async function Blogs() {
-  const blogPostsList = await extractAllBlogs();
-
-  return <BlogList lists={blogPostsList} />;
+  try {
+    const blogPostsList = await extractAllBlogs();
+    return <BlogList lists={blogPostsList} />;
+  } catch (error) {
+    console.error("Error in Blogs component:", error);
+    // Handle error appropriately, e.g., return a default value or show an error message
+    return <div>Error loading blogs</div>;
+  }
 }
